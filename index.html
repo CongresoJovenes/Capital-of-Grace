@@ -79,13 +79,46 @@
         <p>Nada sin ti, nada sin nosotros<br>Cada clic es parte del fuego que arde en nuestros corazones. Gracias por tu entrega.</p>
     </div>
 
-    <script>
-        let count = 0;
+    <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-        function incrementCounter() {
-            count++;
-            document.getElementById('global-count').textContent = count;
-        }
-    </script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBUIT1tZpL9GultjKTb9sceS8R-eeWk9ik",
+      authDomain: "capital-of-grace.firebaseapp.com",
+      projectId: "capital-of-grace",
+      storageBucket: "capital-of-grace.appspot.com",
+      messagingSenderId: "314558258737",
+      appId: "1:314558258737:web:395cff82dbc2aa628a7f10",
+      measurementId: "G-S719H86870"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const counterRef = doc(db, "contador", "global");
+
+    // Inicializa si no existe
+    async function ensureInitialized() {
+      const snap = await getDoc(counterRef);
+      if (!snap.exists()) {
+        await setDoc(counterRef, { count: 0 });
+      }
+    }
+    await ensureInitialized();
+
+    // Escuchar actualizaciones en tiempo real
+    onSnapshot(counterRef, (docSnap) => {
+      const data = docSnap.data();
+      document.getElementById("global-count").textContent = data?.count ?? 0;
+    });
+
+    // Incrementar contador
+    document.getElementById("offer-button").addEventListener("click", async () => {
+      await updateDoc(counterRef, {
+        count: increment(1)
+      });
+    });
+  </script>
 </body>
 </html>
